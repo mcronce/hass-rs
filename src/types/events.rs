@@ -1,4 +1,4 @@
-use crate::types::{Context, HassEntity};
+use crate::types::{Context, HassEntityState};
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
@@ -20,9 +20,9 @@ pub struct HassEvent {
 /// This is part of HassEvent
 #[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
 pub struct EventData {
-    pub entity_id: Option<String>,
-    pub new_state: Option<HassEntity>,
-    pub old_state: Option<HassEntity>,
+    pub entity_id: String,
+    pub new_state: Option<HassEntityState>,
+    pub old_state: Option<HassEntityState>,
 }
 
 impl fmt::Display for HassEvent {
