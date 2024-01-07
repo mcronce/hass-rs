@@ -31,6 +31,7 @@ pub type FieldName = HashMap<String, Field>;
 ///This is part of HassService
 #[derive(Debug, Deserialize, PartialEq)]
 pub struct Field {
-    pub description: String,
+    #[serde(default)]
+    pub description: Option<String>,
     pub example: Option<Value>,
 }
