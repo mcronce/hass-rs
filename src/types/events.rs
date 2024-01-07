@@ -23,3 +23,10 @@ pub struct EventData {
     pub new_state: Option<HassEntityState>,
     pub old_state: Option<HassEntityState>,
 }
+
+#[derive(Debug, Deserialize, PartialEq)]
+pub struct MqttEvent {
+	pub event_type: String,
+	pub event_data: EventData
+}
+
