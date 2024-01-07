@@ -91,7 +91,7 @@ impl HassClient {
 
         //Send Ping command and expect Pong
         let ping_req = Command::Ping(Ask {
-            id: Some(id),
+            id,
             msg_type: "ping",
         });
 
@@ -114,7 +114,7 @@ impl HassClient {
 
         //Send GetConfig command and expect Pong
         let config_req = Command::GetConfig(Ask {
-            id: Some(id),
+            id,
             msg_type: "get_config",
         });
         let response = self.command(config_req).await?;
@@ -159,7 +159,7 @@ impl HassClient {
     /// ```
     pub async fn get_area_registry(&mut self) -> HassResult<Vec<HassArea>> {
         let config_req = Command::GetConfig(Ask {
-            id: Some(0),
+            id: 0,
             msg_type: "config/area_registry/list",
         });
         let response = self.command(config_req).await?;
@@ -203,7 +203,7 @@ impl HassClient {
     /// ```
     pub async fn get_device_registry(&mut self) -> HassResult<Vec<HassDevice>> {
         let config_req = Command::GetConfig(Ask {
-            id: Some(0),
+            id: 0,
             msg_type: "config/device_registry/list",
         });
         let response = self.command(config_req).await?;
@@ -247,7 +247,7 @@ impl HassClient {
     /// ```
     pub async fn get_entity_registry(&mut self) -> HassResult<Vec<HassEntity>> {
         let config_req = Command::GetConfig(Ask {
-            id: Some(0),
+            id: 0,
             msg_type: "config/entity_registry/list",
         });
         let response = self.command(config_req).await?;
@@ -274,7 +274,7 @@ impl HassClient {
 
         //Send GetStates command and expect a number of Entities
         let states_req = Command::GetStates(Ask {
-            id: Some(id),
+            id,
             msg_type: "get_states",
         });
         let response = self.command(states_req).await?;
@@ -300,7 +300,7 @@ impl HassClient {
         let id = get_last_seq(&self.last_sequence).expect("could not read the Atomic value");
         //Send GetStates command and expect a number of Entities
         let services_req = Command::GetServices(Ask {
-            id: Some(id),
+            id,
             msg_type: "get_services",
         });
         let response = self.command(services_req).await?;
@@ -328,7 +328,7 @@ impl HassClient {
 
         //Send GetStates command and expect a number of Entities
         let services_req = Command::GetPanels(Ask {
-            id: Some(id),
+            id,
             msg_type: "get_panels",
         });
         let response = self.command(services_req).await?;
@@ -363,7 +363,7 @@ impl HassClient {
 
         //Send GetStates command and expect a number of Entities
         let services_req = Command::CallService(CallService {
-            id: Some(id),
+            id,
             msg_type: "call_service",
             domain,
             service,
@@ -393,7 +393,7 @@ impl HassClient {
 
         //create the Event Subscribe Command
         let cmd = Command::SubscribeEvent(Subscribe {
-            id: Some(id),
+            id,
             msg_type: "subscribe_events",
             event_type: event_name.to_owned(),
         });
@@ -422,7 +422,7 @@ impl HassClient {
 
         //Unsubscribe the Event
         let unsubscribe_req = Command::Unsubscribe(Unsubscribe {
-            id: Some(id),
+            id,
             msg_type: "unsubscribe_events",
             subscription: subscription_id,
         });

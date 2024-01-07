@@ -75,7 +75,7 @@ pub(crate) struct Auth {
 //used to fetch from server
 #[derive(Debug, Serialize, PartialEq)]
 pub(crate) struct Ask {
-    pub(crate) id: Option<u64>,
+    pub(crate) id: u64,
     #[serde(rename = "type")]
     pub(crate) msg_type: &'static str,
 }
@@ -83,7 +83,7 @@ pub(crate) struct Ask {
 //used for Event subscribtion
 #[derive(Debug, Serialize, PartialEq)]
 pub(crate) struct Subscribe {
-    pub(crate) id: Option<u64>,
+    pub(crate) id: u64,
     #[serde(rename = "type")]
     pub(crate) msg_type: &'static str,
     pub(crate) event_type: String,
@@ -92,7 +92,7 @@ pub(crate) struct Subscribe {
 //used for Event Unsubscribe
 #[derive(Debug, Serialize, PartialEq)]
 pub(crate) struct Unsubscribe {
-    pub(crate) id: Option<u64>,
+    pub(crate) id: u64,
     #[serde(rename = "type")]
     pub(crate) msg_type: &'static str,
     pub(crate) subscription: u64,
@@ -101,7 +101,7 @@ pub(crate) struct Unsubscribe {
 //used to call a service
 #[derive(Debug, Serialize, PartialEq)]
 pub(crate) struct CallService {
-    pub(crate) id: Option<u64>,
+    pub(crate) id: u64,
     #[serde(rename = "type")]
     pub(crate) msg_type: &'static str,
     pub(crate) domain: String,
