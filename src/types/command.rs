@@ -68,7 +68,7 @@ impl Command {
 #[derive(Debug, Serialize, PartialEq)]
 pub(crate) struct Auth {
     #[serde(rename = "type")]
-    pub(crate) msg_type: String,
+    pub(crate) msg_type: &'static str,
     pub(crate) access_token: String,
 }
 
@@ -77,7 +77,7 @@ pub(crate) struct Auth {
 pub(crate) struct Ask {
     pub(crate) id: Option<u64>,
     #[serde(rename = "type")]
-    pub(crate) msg_type: String,
+    pub(crate) msg_type: &'static str,
 }
 
 //used for Event subscribtion
@@ -85,7 +85,7 @@ pub(crate) struct Ask {
 pub(crate) struct Subscribe {
     pub(crate) id: Option<u64>,
     #[serde(rename = "type")]
-    pub(crate) msg_type: String,
+    pub(crate) msg_type: &'static str,
     pub(crate) event_type: String,
 }
 
@@ -94,7 +94,7 @@ pub(crate) struct Subscribe {
 pub(crate) struct Unsubscribe {
     pub(crate) id: Option<u64>,
     #[serde(rename = "type")]
-    pub(crate) msg_type: String,
+    pub(crate) msg_type: &'static str,
     pub(crate) subscription: u64,
 }
 
@@ -103,7 +103,7 @@ pub(crate) struct Unsubscribe {
 pub(crate) struct CallService {
     pub(crate) id: Option<u64>,
     #[serde(rename = "type")]
-    pub(crate) msg_type: String,
+    pub(crate) msg_type: &'static str,
     pub(crate) domain: String,
     pub(crate) service: String,
     pub(crate) service_data: Option<Value>,

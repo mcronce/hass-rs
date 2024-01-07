@@ -10,6 +10,7 @@ use crate::{Receiver, Sender};
 use async_tungstenite::tungstenite::Error;
 use async_tungstenite::tungstenite::Message as TungsteniteMessage;
 use serde_json::Value;
+use std::borrow::Cow;
 use std::collections::HashMap;
 use std::sync::{
     atomic::{AtomicU64, Ordering},
@@ -56,20 +57,20 @@ impl HassClient {
     /// If the client supplies valid authentication, the authentication phase will complete by the server sending the auth_ok message.
     /// If the data is incorrect, the server will reply with auth_invalid message and disconnect the session.
 
-    pub async fn auth_with_longlivedtoken(&mut self, token: &str) -> HassResult<()> {
+    pub async fn auth_with_longlivedtoken(&mut self, token: String) -> HassResult<()> {
         // Auth Request from Gateway { "type": "auth_required"}
         if let Ok(Response::AuthRequired(msg)) = self.ws_receive().await {
             if msg.msg_type != "auth_required".to_string() {
-                return Err(HassError::Generic(
-                    "Expecting the first message from server to be auth_required".to_string(),
-                ));
+                return Err(HassError::Generic(Cow::Borrowed(
+                    "Expecting the first message from server to be auth_required",
+                )));
             }
         }
 
         //Authenticate with Command::AuthInit and payload {"type": "auth", "access_token": "XXXXX"}
         let auth_message = Command::AuthInit(Auth {
-            msg_type: "auth".to_owned(),
-            access_token: token.to_owned(),
+            msg_type: "auth",
+            access_token: token,
         });
 
         let response = self.command(auth_message).await?;
@@ -85,20 +86,20 @@ impl HassClient {
     /// The API supports receiving a ping from the client and returning a pong.
     /// This serves as a heartbeat to ensure the connection is still alive.
 
-    pub async fn ping(&mut self) -> HassResult<String> {
+    pub async fn ping(&mut self) -> HassResult<&'static str> {
         let id = get_last_seq(&self.last_sequence).expect("could not read the Atomic value");
 
         //Send Ping command and expect Pong
         let ping_req = Command::Ping(Ask {
             id: Some(id),
-            msg_type: "ping".to_owned(),
+            msg_type: "ping",
         });
 
         let response = self.command(ping_req).await?;
 
         //Check the response, if the Pong was received
         match response {
-            Response::Pong(_v) => Ok("pong".to_owned()),
+            Response::Pong(_v) => Ok("pong"),
             Response::Result(err) => return Err(HassError::ReponseError(err)),
             _ => return Err(HassError::UnknownPayloadReceived),
         }
@@ -114,7 +115,7 @@ impl HassClient {
         //Send GetConfig command and expect Pong
         let config_req = Command::GetConfig(Ask {
             id: Some(id),
-            msg_type: "get_config".to_owned(),
+            msg_type: "get_config",
         });
         let response = self.command(config_req).await?;
 
@@ -146,7 +147,7 @@ impl HassClient {
     /// async fn main() -> Result<(), Box<dyn std::error::Error>>{
     ///
     ///     let mut client = client::connect("localhost", 8123).await?;
-    ///     client.auth_with_longlivedtoken("your_token").await?;
+    ///     client.auth_with_longlivedtoken("your_token".to_owned()).await?;
     ///
     ///     println!("Get Hass Areas");
     ///     match client.get_area_registry().await {
@@ -159,7 +160,7 @@ impl HassClient {
     pub async fn get_area_registry(&mut self) -> HassResult<Vec<HassArea>> {
         let config_req = Command::GetConfig(Ask {
             id: Some(0),
-            msg_type: "config/area_registry/list".to_owned(),
+            msg_type: "config/area_registry/list",
         });
         let response = self.command(config_req).await?;
 
@@ -190,7 +191,7 @@ impl HassClient {
     /// async fn main() -> Result<(), Box<dyn std::error::Error>>{
     ///
     ///     let mut client = client::connect("localhost", 8123).await?;
-    ///     client.auth_with_longlivedtoken("your_token").await?;
+    ///     client.auth_with_longlivedtoken("your_token".to_owned()).await?;
     ///
     ///     println!("Get Hass Devices");
     ///     match client.get_device_registry().await {
@@ -203,7 +204,7 @@ impl HassClient {
     pub async fn get_device_registry(&mut self) -> HassResult<Vec<HassDevice>> {
         let config_req = Command::GetConfig(Ask {
             id: Some(0),
-            msg_type: "config/device_registry/list".to_owned(),
+            msg_type: "config/device_registry/list",
         });
         let response = self.command(config_req).await?;
 
@@ -234,7 +235,7 @@ impl HassClient {
     /// async fn main() -> Result<(), Box<dyn std::error::Error>>{
     ///
     ///     let mut client = client::connect("localhost", 8123).await?;
-    ///     client.auth_with_longlivedtoken("your_token").await?;
+    ///     client.auth_with_longlivedtoken("your_token".to_owned()).await?;
     ///
     ///     println!("Get Hass Entities");
     ///     match client.get_entity_registry().await {
@@ -247,7 +248,7 @@ impl HassClient {
     pub async fn get_entity_registry(&mut self) -> HassResult<Vec<HassEntity>> {
         let config_req = Command::GetConfig(Ask {
             id: Some(0),
-            msg_type: "config/entity_registry/list".to_owned(),
+            msg_type: "config/entity_registry/list",
         });
         let response = self.command(config_req).await?;
 
@@ -274,7 +275,7 @@ impl HassClient {
         //Send GetStates command and expect a number of Entities
         let states_req = Command::GetStates(Ask {
             id: Some(id),
-            msg_type: "get_states".to_owned(),
+            msg_type: "get_states",
         });
         let response = self.command(states_req).await?;
 
@@ -300,7 +301,7 @@ impl HassClient {
         //Send GetStates command and expect a number of Entities
         let services_req = Command::GetServices(Ask {
             id: Some(id),
-            msg_type: "get_services".to_owned(),
+            msg_type: "get_services",
         });
         let response = self.command(services_req).await?;
 
@@ -328,7 +329,7 @@ impl HassClient {
         //Send GetStates command and expect a number of Entities
         let services_req = Command::GetPanels(Ask {
             id: Some(id),
-            msg_type: "get_panels".to_owned(),
+            msg_type: "get_panels",
         });
         let response = self.command(services_req).await?;
 
@@ -357,13 +358,13 @@ impl HassClient {
         domain: String,
         service: String,
         service_data: Option<Value>,
-    ) -> HassResult<String> {
+    ) -> HassResult<&'static str> {
         let id = get_last_seq(&self.last_sequence).expect("could not read the Atomic value");
 
         //Send GetStates command and expect a number of Entities
         let services_req = Command::CallService(CallService {
             id: Some(id),
-            msg_type: "call_service".to_owned(),
+            msg_type: "call_service",
             domain,
             service,
             service_data,
@@ -372,7 +373,7 @@ impl HassClient {
 
         match response {
             Response::Result(data) => match data.success {
-                true => return Ok("command executed successfully".to_owned()),
+                true => return Ok("command executed successfully"),
                 false => return Err(HassError::ReponseError(data)),
             },
             _ => return Err(HassError::UnknownPayloadReceived),
@@ -393,7 +394,7 @@ impl HassClient {
         //create the Event Subscribe Command
         let cmd = Command::SubscribeEvent(Subscribe {
             id: Some(id),
-            msg_type: "subscribe_events".to_owned(),
+            msg_type: "subscribe_events",
             event_type: event_name.to_owned(),
         });
 
@@ -416,13 +417,13 @@ impl HassClient {
     /// You can unsubscribe from previously created subscription events.
     /// Pass the id of the original subscription command as value to the subscription field.
 
-    pub async fn unsubscribe_event(&mut self, subscription_id: u64) -> HassResult<String> {
+    pub async fn unsubscribe_event(&mut self, subscription_id: u64) -> HassResult<&'static str> {
         let id = get_last_seq(&self.last_sequence).expect("could not read the Atomic value");
 
         //Unsubscribe the Event
         let unsubscribe_req = Command::Unsubscribe(Unsubscribe {
             id: Some(id),
-            msg_type: "unsubscribe_events".to_owned(),
+            msg_type: "unsubscribe_events",
             subscription: subscription_id,
         });
 
@@ -433,9 +434,9 @@ impl HassClient {
         match response {
             Response::Result(v) if v.success == true => {
                 if let Some(_) = self.subscriptions.remove(&subscription_id) {
-                    return Ok("Ok".to_owned());
+                    return Ok("Ok");
                 }
-                return Err(HassError::Generic("Wrong subscription ID".to_owned()));
+                return Err(HassError::Generic(Cow::Borrowed("Wrong subscription ID")));
             }
             Response::Result(v) if v.success == false => return Err(HassError::ReponseError(v)),
             _ => return Err(HassError::UnknownPayloadReceived),

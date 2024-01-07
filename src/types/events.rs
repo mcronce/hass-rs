@@ -44,7 +44,6 @@ impl fmt::Display for HassEvent {
 
 #[derive(Debug, Deserialize, PartialEq)]
 pub struct MqttEvent {
-	pub event_type: String,
-	pub event_data: EventData
+    pub event_type: String,
+    pub event_data: EventData,
 }
-

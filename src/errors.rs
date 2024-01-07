@@ -5,6 +5,7 @@ use async_tungstenite::tungstenite;
 
 #[cfg(feature = "use-async-std")]
 use async_std::channel::RecvError;
+use std::borrow::Cow;
 use std::fmt;
 
 pub type HassResult<T> = std::result::Result<T, HassError>;
@@ -40,7 +41,7 @@ pub enum HassError {
     ReponseError(WSResult),
 
     /// Returned for errors which do not fit any of the above criterias
-    Generic(String),
+    Generic(Cow<'static, str>),
 }
 
 impl std::error::Error for HassError {}
@@ -100,7 +101,7 @@ impl From<&tungstenite::error::Error> for HassError {
                 tungstenite::error::Error::ConnectionClosed
             }
             tungstenite::error::Error::AlreadyClosed => tungstenite::error::Error::AlreadyClosed,
-            _ => return HassError::Generic(format!("Error from ws {}", error)),
+            _ => return HassError::Generic(Cow::Owned(format!("Error from ws {}", error))),
         };
         HassError::TungsteniteError(e)
     }
