@@ -1,4 +1,4 @@
-use crate::types::{Context, HassEntity};
+use crate::types::{Context, HassEntityState};
 use serde::Deserialize;
 
 /// This object represents the Home Assistant Event
@@ -20,6 +20,6 @@ pub struct HassEvent {
 #[derive(Debug, Deserialize, PartialEq)]
 pub struct EventData {
     pub entity_id: String,
-    pub new_state: Option<HassEntity>,
-    pub old_state: Option<HassEntity>,
+    pub new_state: Option<HassEntityState>,
+    pub old_state: Option<HassEntityState>,
 }

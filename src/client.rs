@@ -3,8 +3,8 @@
 //! Provides an async connect and methods for issuing the supported commands.
 
 use crate::types::{
-    Ask, Auth, CallService, Command, HassConfig, HassEntity, HassPanels, HassServices, Response,
-    WSEvent,
+    Ask, Auth, CallService, Command, HassArea, HassConfig, HassDevice, HassEntity, HassEntityState,
+    HassPanels, HassServices, Response, WSEvent,
 };
 use crate::{HassError, HassResult, WsConn};
 
@@ -244,6 +244,138 @@ impl HassClient {
         }
     }
 
+    /// This will get a dump of all the current areas in Home Assistant.
+    ///
+    /// The server will respond with a result message containing the areas.
+    /// # Examples
+    ///
+    /// Demonstrates basic usage.
+    ///
+    /// ```no_run
+    /// use hass_rs::client;
+    ///
+    /// #[async_std::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>>{
+    ///
+    ///     let mut client = client::connect("localhost", 8123).await?;
+    ///     client.auth_with_longlivedtoken("your_token").await?;
+    ///
+    ///     println!("Get Hass Areas");
+    ///     match client.get_area_registry().await {
+    ///         Ok(v) => println!("{:?}", v),
+    ///         Err(err) => println!("Oh no, an error: {}", err),
+    ///     }
+    ///     Ok(())
+    /// }
+    /// ```
+    pub async fn get_area_registry(&mut self) -> HassResult<Vec<HassArea>> {
+        let config_req = Command::GetConfig(Ask {
+            id: Some(0),
+            msg_type: "config/area_registry/list".to_owned(),
+        });
+        let response = self.gateway.command(config_req).await?;
+
+        match response {
+            Response::Result(data) => match data.success {
+                true => {
+                    let areas =
+                        serde_json::from_value(data.result.expect("Expecting to get HassArea"))?;
+                    Ok(areas)
+                }
+                false => Err(HassError::ReponseError(data)),
+            },
+            _ => Err(HassError::UnknownPayloadReceived),
+        }
+    }
+
+    /// This will get a dump of all the current devices in Home Assistant.
+    ///
+    /// The server will respond with a result message containing the devices.
+    /// # Examples
+    ///
+    /// Demonstrates basic usage.
+    ///
+    /// ```no_run
+    /// use hass_rs::client;
+    ///
+    /// #[async_std::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>>{
+    ///
+    ///     let mut client = client::connect("localhost", 8123).await?;
+    ///     client.auth_with_longlivedtoken("your_token").await?;
+    ///
+    ///     println!("Get Hass Devices");
+    ///     match client.get_device_registry().await {
+    ///         Ok(v) => println!("{:?}", v),
+    ///         Err(err) => println!("Oh no, an error: {}", err),
+    ///     }
+    ///     Ok(())
+    /// }
+    /// ```
+    pub async fn get_device_registry(&mut self) -> HassResult<Vec<HassDevice>> {
+        let config_req = Command::GetConfig(Ask {
+            id: Some(0),
+            msg_type: "config/device_registry/list".to_owned(),
+        });
+        let response = self.gateway.command(config_req).await?;
+
+        match response {
+            Response::Result(data) => match data.success {
+                true => {
+                    let devices =
+                        serde_json::from_value(data.result.expect("Expecting to get HassDevice"))?;
+                    Ok(devices)
+                }
+                false => Err(HassError::ReponseError(data)),
+            },
+            _ => Err(HassError::UnknownPayloadReceived),
+        }
+    }
+
+    /// This will get a dump of all the current entities in Home Assistant.
+    ///
+    /// The server will respond with a result message containing the entities.
+    /// # Examples
+    ///
+    /// Demonstrates basic usage.
+    ///
+    /// ```no_run
+    /// use hass_rs::client;
+    ///
+    /// #[async_std::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>>{
+    ///
+    ///     let mut client = client::connect("localhost", 8123).await?;
+    ///     client.auth_with_longlivedtoken("your_token").await?;
+    ///
+    ///     println!("Get Hass Entities");
+    ///     match client.get_entity_registry().await {
+    ///         Ok(v) => println!("{:?}", v),
+    ///         Err(err) => println!("Oh no, an error: {}", err),
+    ///     }
+    ///     Ok(())
+    /// }
+    /// ```
+    pub async fn get_entity_registry(&mut self) -> HassResult<Vec<HassEntity>> {
+        let config_req = Command::GetConfig(Ask {
+            id: Some(0),
+            msg_type: "config/entity_registry/list".to_owned(),
+        });
+        let response = self.gateway.command(config_req).await?;
+
+        match response {
+            Response::Result(data) => match data.success {
+                true => {
+                    let entities =
+                        serde_json::from_value(data.result.expect("Expecting to get HassEntity"))?;
+                    Ok(entities)
+                }
+                false => Err(HassError::ReponseError(data)),
+            },
+            _ => Err(HassError::UnknownPayloadReceived),
+        }
+    }
+
     ///This will get a dump of all the current states in Home Assistant.
     ///
     /// The server will respond with a result message containing the states.
@@ -268,7 +400,7 @@ impl HassClient {
     ///     Ok(())
     /// }
     /// ```
-    pub async fn get_states(&mut self) -> HassResult<Vec<HassEntity>> {
+    pub async fn get_states(&mut self) -> HassResult<Vec<HassEntityState>> {
         //Send GetStates command and expect a number of Entities
         let states_req = Command::GetStates(Ask {
             id: Some(0),
@@ -279,7 +411,7 @@ impl HassClient {
         match response {
             Response::Result(data) => match data.success {
                 true => {
-                    let states: Vec<HassEntity> =
+                    let states: Vec<HassEntityState> =
                         serde_json::from_value(data.result.expect("Expecting to get the States"))?;
                     return Ok(states);
                 }
