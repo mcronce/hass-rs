@@ -136,27 +136,7 @@ impl HassClient {
     /// This will get a dump of all the current areas in Home Assistant.
     ///
     /// The server will respond with a result message containing the areas.
-    /// # Examples
-    ///
-    /// Demonstrates basic usage.
-    ///
-    /// ```no_run
-    /// use hass_rs::client;
-    ///
-    /// #[async_std::main]
-    /// async fn main() -> Result<(), Box<dyn std::error::Error>>{
-    ///
-    ///     let mut client = client::connect("localhost", 8123).await?;
-    ///     client.auth_with_longlivedtoken("your_token".to_owned()).await?;
-    ///
-    ///     println!("Get Hass Areas");
-    ///     match client.get_area_registry().await {
-    ///         Ok(v) => println!("{:?}", v),
-    ///         Err(err) => println!("Oh no, an error: {}", err),
-    ///     }
-    ///     Ok(())
-    /// }
-    /// ```
+
     pub async fn get_area_registry(&mut self) -> HassResult<Vec<HassArea>> {
         let config_req = Command::GetConfig(Ask {
             id: 0,
@@ -180,27 +160,7 @@ impl HassClient {
     /// This will get a dump of all the current devices in Home Assistant.
     ///
     /// The server will respond with a result message containing the devices.
-    /// # Examples
-    ///
-    /// Demonstrates basic usage.
-    ///
-    /// ```no_run
-    /// use hass_rs::client;
-    ///
-    /// #[async_std::main]
-    /// async fn main() -> Result<(), Box<dyn std::error::Error>>{
-    ///
-    ///     let mut client = client::connect("localhost", 8123).await?;
-    ///     client.auth_with_longlivedtoken("your_token".to_owned()).await?;
-    ///
-    ///     println!("Get Hass Devices");
-    ///     match client.get_device_registry().await {
-    ///         Ok(v) => println!("{:?}", v),
-    ///         Err(err) => println!("Oh no, an error: {}", err),
-    ///     }
-    ///     Ok(())
-    /// }
-    /// ```
+
     pub async fn get_device_registry(&mut self) -> HassResult<Vec<HassDevice>> {
         let config_req = Command::GetConfig(Ask {
             id: 0,
@@ -224,27 +184,7 @@ impl HassClient {
     /// This will get a dump of all the current entities in Home Assistant.
     ///
     /// The server will respond with a result message containing the entities.
-    /// # Examples
-    ///
-    /// Demonstrates basic usage.
-    ///
-    /// ```no_run
-    /// use hass_rs::client;
-    ///
-    /// #[async_std::main]
-    /// async fn main() -> Result<(), Box<dyn std::error::Error>>{
-    ///
-    ///     let mut client = client::connect("localhost", 8123).await?;
-    ///     client.auth_with_longlivedtoken("your_token".to_owned()).await?;
-    ///
-    ///     println!("Get Hass Entities");
-    ///     match client.get_entity_registry().await {
-    ///         Ok(v) => println!("{:?}", v),
-    ///         Err(err) => println!("Oh no, an error: {}", err),
-    ///     }
-    ///     Ok(())
-    /// }
-    /// ```
+
     pub async fn get_entity_registry(&mut self) -> HassResult<Vec<HassEntity>> {
         let config_req = Command::GetConfig(Ask {
             id: 0,

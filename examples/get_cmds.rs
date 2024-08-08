@@ -60,7 +60,7 @@ async fn main() {
     let mut client = HassClient::new(to_gateway, from_gateway);
 
     client
-        .auth_with_longlivedtoken(&*TOKEN)
+        .auth_with_longlivedtoken(TOKEN.clone())
         .await
         .expect("Not able to autheticate");
 

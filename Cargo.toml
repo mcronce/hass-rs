@@ -51,7 +51,3 @@ path = "examples/call_service.rs"
 name = "subscribe_event"
 path = "examples/subscribe_event.rs"
 
-[[example]]
-name = "get_cmds_async_std"
-path = "examples/get_cmds_async_std.rs"
-
