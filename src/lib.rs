@@ -15,4 +15,4 @@ pub mod client;
 pub use client::HassClient;
 
 mod runtime;
-use runtime::{Receiver, Sender};
+use runtime::{channel, spawn, ws_incoming_messages, ws_outgoing_messages, Receiver, Sender};
