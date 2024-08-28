@@ -50,6 +50,27 @@ impl HassClient {
         }
     }
 
+	pub async fn connect(host: &str, port: u16) -> HassResult<Self> {
+		let addr = format!("ws://{}:{}/api/websocket", host, port);
+		let url = url::Url::parse(&addr).unwrap();
+
+		let (client, _) = async_tungstenite::tokio::connect_async(url).await?;
+		let (sink, stream) = client.split();
+
+		//Channels to recieve the Client Command and send it over to Websocket server
+		let (to_gateway, from_user) = channel::<TungsteniteMessage>(20);
+		//Channels to receive the Response from the Websocket server and send it over to Client
+		let (to_user, from_gateway) = channel::<Result<TungsteniteMessage, Error>>(20);
+
+		// Handle incoming messages in a separate task
+		let read_handle = spawn(ws_incoming_messages(stream, to_user));
+
+		// Read from command line and send messages
+		let write_handle = spawn(ws_outgoing_messages(sink, from_user));
+
+		Ok(Self::new(to_gateway, from_gateway))
+	}
+
     /// authenticate the session using a long-lived access token
     ///
     /// When a client connects to the server, the server sends out auth_required.
