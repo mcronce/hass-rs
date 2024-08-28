@@ -1,6 +1,8 @@
 use async_tungstenite::tungstenite::{Error, Message};
 use async_tungstenite::WebSocketStream;
-use futures_util::stream::{SplitSink, SplitStream};
+use futures::io::{AsyncRead, AsyncWrite};
+use futures::sink::SinkExt;
+use futures::stream::{StreamExt, SplitSink, SplitStream};
 
 // ******************************
 // ASYNC-STD Channels
@@ -10,8 +12,6 @@ use futures_util::stream::{SplitSink, SplitStream};
 pub use async_std::channel::{unbounded as channel, Receiver, Sender};
 #[cfg(feature = "use-async-std")]
 pub use async_std::task::spawn;
-#[cfg(feature = "use-async-std")]
-use async_std::{AsyncRead, AsyncWrite};
 
 // ******************************
 // Tokio Channels
@@ -20,8 +20,6 @@ use async_std::{AsyncRead, AsyncWrite};
 pub use tokio::sync::mpsc::{channel, Receiver, Sender};
 #[cfg(feature = "use-tokio")]
 pub use tokio::task::spawn;
-#[cfg(feature = "use-tokio")]
-use tokio::io::{AsyncRead, AsyncWrite};
 
 pub async fn ws_incoming_messages(
     mut stream: SplitStream<WebSocketStream<impl AsyncRead + AsyncWrite + Unpin>>,

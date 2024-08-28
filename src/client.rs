@@ -9,7 +9,7 @@ use crate::{channel, spawn, ws_incoming_messages, ws_outgoing_messages, Receiver
 
 use async_tungstenite::tungstenite::Error;
 use async_tungstenite::tungstenite::Message as TungsteniteMessage;
-use futures_util::StreamExt;
+use futures::stream::StreamExt;
 use serde_json::Value;
 use std::borrow::Cow;
 use std::collections::HashMap;
@@ -64,10 +64,10 @@ impl HassClient {
 		let (to_user, from_gateway) = channel::<Result<TungsteniteMessage, Error>>(20);
 
 		// Handle incoming messages in a separate task
-		let read_handle = spawn(ws_incoming_messages(stream, to_user));
+		let _read_handle = spawn(ws_incoming_messages(stream, to_user));
 
 		// Read from command line and send messages
-		let write_handle = spawn(ws_outgoing_messages(sink, from_user));
+		let _write_handle = spawn(ws_outgoing_messages(sink, from_user));
 
 		Ok(Self::new(to_gateway, from_gateway))
 	}
