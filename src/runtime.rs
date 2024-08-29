@@ -2,7 +2,7 @@ use async_tungstenite::tungstenite::{Error, Message};
 use async_tungstenite::WebSocketStream;
 use futures::io::{AsyncRead, AsyncWrite};
 use futures::sink::SinkExt;
-use futures::stream::{StreamExt, SplitSink, SplitStream};
+use futures::stream::{SplitSink, SplitStream, StreamExt};
 
 // ******************************
 // ASYNC-STD Channels
@@ -43,4 +43,3 @@ pub async fn ws_outgoing_messages(
         }
     }
 }
-

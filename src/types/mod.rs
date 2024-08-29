@@ -1,5 +1,4 @@
 //! API types.
-
 mod command;
 mod config;
 mod entities;

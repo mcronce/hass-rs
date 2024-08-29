@@ -4,8 +4,8 @@ use crate::types::{
     Ask, Auth, CallService, Command, HassArea, HassConfig, HassDevice, HassEntity, HassEntityState,
     HassPanels, HassServices, Response, Subscribe, Unsubscribe, WSEvent,
 };
-use crate::{HassError, HassResult, WSResult};
 use crate::{channel, spawn, ws_incoming_messages, ws_outgoing_messages, Receiver, Sender};
+use crate::{HassError, HassResult, WSResult};
 
 use async_tungstenite::tungstenite::Error;
 use async_tungstenite::tungstenite::Message as TungsteniteMessage;
@@ -51,26 +51,26 @@ impl HassClient {
         }
     }
 
-	pub async fn connect(host: &str, port: u16) -> HassResult<Self> {
-		let addr = format!("ws://{}:{}/api/websocket", host, port);
-		let url = url::Url::parse(&addr).unwrap();
+    pub async fn connect(host: &str, port: u16) -> HassResult<Self> {
+        let addr = format!("ws://{}:{}/api/websocket", host, port);
+        let url = url::Url::parse(&addr).unwrap();
 
-		let (client, _) = async_tungstenite::tokio::connect_async(url).await?;
-		let (sink, stream) = client.split();
+        let (client, _) = async_tungstenite::tokio::connect_async(url).await?;
+        let (sink, stream) = client.split();
 
-		//Channels to recieve the Client Command and send it over to Websocket server
-		let (to_gateway, from_user) = channel::<TungsteniteMessage>(20);
-		//Channels to receive the Response from the Websocket server and send it over to Client
-		let (to_user, from_gateway) = channel::<Result<TungsteniteMessage, Error>>(20);
+        //Channels to recieve the Client Command and send it over to Websocket server
+        let (to_gateway, from_user) = channel::<TungsteniteMessage>(20);
+        //Channels to receive the Response from the Websocket server and send it over to Client
+        let (to_user, from_gateway) = channel::<Result<TungsteniteMessage, Error>>(20);
 
-		// Handle incoming messages in a separate task
-		let _read_handle = spawn(ws_incoming_messages(stream, to_user));
+        // Handle incoming messages in a separate task
+        let _read_handle = spawn(ws_incoming_messages(stream, to_user));
 
-		// Read from command line and send messages
-		let _write_handle = spawn(ws_outgoing_messages(sink, from_user));
+        // Read from command line and send messages
+        let _write_handle = spawn(ws_outgoing_messages(sink, from_user));
 
-		Ok(Self::new(to_gateway, from_gateway))
-	}
+        Ok(Self::new(to_gateway, from_gateway))
+    }
 
     /// authenticate the session using a long-lived access token
     ///
