@@ -160,8 +160,10 @@ impl HassClient {
     /// The server will respond with a result message containing the areas.
 
     pub async fn get_area_registry(&mut self) -> HassResult<Vec<HassArea>> {
+        let id = get_last_seq(&self.last_sequence).expect("could not read the Atomic value");
+
         let config_req = Command::GetConfig(Ask {
-            id: 0,
+            id,
             msg_type: "config/area_registry/list",
         });
         let response = self.command(config_req).await?;
@@ -184,8 +186,10 @@ impl HassClient {
     /// The server will respond with a result message containing the devices.
 
     pub async fn get_device_registry(&mut self) -> HassResult<Vec<HassDevice>> {
+        let id = get_last_seq(&self.last_sequence).expect("could not read the Atomic value");
+
         let config_req = Command::GetConfig(Ask {
-            id: 0,
+            id,
             msg_type: "config/device_registry/list",
         });
         let response = self.command(config_req).await?;
@@ -208,8 +212,10 @@ impl HassClient {
     /// The server will respond with a result message containing the entities.
 
     pub async fn get_entity_registry(&mut self) -> HassResult<Vec<HassEntity>> {
+        let id = get_last_seq(&self.last_sequence).expect("could not read the Atomic value");
+
         let config_req = Command::GetConfig(Ask {
-            id: 0,
+            id,
             msg_type: "config/entity_registry/list",
         });
         let response = self.command(config_req).await?;
