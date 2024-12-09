@@ -98,7 +98,7 @@ pub struct HassDevice {
     pub disabled_by: Option<String>,
     pub entry_type: Option<String>,
     pub hw_version: Option<String>,
-    pub identifiers: Vec<(String, String)>,
+    //pub identifiers: Vec<(String, String)>,
     pub manufacturer: Option<String>,
     pub model: Option<String>,
     pub name_by_user: Option<String>,
